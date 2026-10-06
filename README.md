@@ -16,9 +16,10 @@
 
 | Умение | Команда | Результат |
 |---|---|---|
+| Разобрать **один** заказ | `python scripts/orders_ops.py order --external-id fl-2411-001` | решение, причина, черновик → `reports/latest-order.md` |
 | Проверить связь с ядром | `python scripts/orders_ops.py health` | статус, провайдер, тратит ли деньги |
 | Залить заказы в ядро | `python scripts/orders_ops.py ingest` | идемпотентно, без дублей |
-| Разобрать заказы | `python scripts/orders_ops.py triage --analyze --only-new` | `reports/latest-triage.md` |
+| Разобрать пачку заказов | `python scripts/orders_ops.py triage --analyze --only-new` | `reports/latest-triage.md` |
 | Очередь проверки | `python scripts/orders_ops.py queue` | что ждёт решения человека |
 | Сводка (по расписанию) | `python scripts/orders_ops.py summary` | `reports/daily-summary.md` |
 | Сквозные сценарии | `python scripts/orders_ops.py test` | `tests/results.json` |
@@ -40,6 +41,19 @@ data/orders-seed.json  5 пробных заказов
 tests/messages.json    5 сценариев с ожидаемым результатом
 reports/               сюда агент пишет отчёты
 ```
+
+## Автоматический запуск
+
+Сводка «новые заказы и очередь ручной проверки» формируется двумя путями:
+
+1. **Cron Job OpenClaw** — `0 8 * * *`, часовой пояс `Asia/Krasnoyarsk` (UTC+07:00), изолированная
+   сессия, агент `orders-operator`.
+2. **Задача Windows «Orders Agent Summary (logon)»** — триггер «при входе в систему», запускает
+   `scripts/daily_summary.cmd` → `python scripts/orders_ops.py summary`, без обращения к модели
+   (не зависит от квоты и доступности gateway). Нужна потому, что компьютер между сессиями
+   выключается, и задача по часам может срабатывать вхолостую.
+
+Обе пишут в `reports/daily-summary.md` (журнал запуска по входу — `reports/logon-summary.log`).
 
 ## Как запустить
 
