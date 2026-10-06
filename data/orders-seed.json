@@ -1,0 +1,53 @@
+[
+  {
+    "external_id": "fl-2411-001",
+    "title": "AI-агент для разбора заявок и подготовки отчётов",
+    "description": "Ищу исполнителя для разработки ИИ-агента: нужно принимать входящие заявки, разбирать их по типам, готовить черновики ответов и по расписанию формировать сводку. Стек: Python, FastAPI, PostgreSQL, Docker, вызовы LLM через API. Есть готовое ТЗ, тестовые данные и доступ к тестовому стенду.",
+    "budget_min": 80000,
+    "budget_max": 140000,
+    "currency": "RUB",
+    "url": "https://example.com/orders/fl-2411-001",
+    "client_name": "ООО «Северный поток»",
+    "source": "manual"
+  },
+  {
+    "external_id": "fl-2411-002",
+    "title": "Доработать Telegram-бота для заявок",
+    "description": "Есть Telegram-бот на Python, нужно добавить приём заявок и уведомления менеджеру. Бюджет обсудим после оценки, пришлите вилку и сроки. Стек: Python, aiogram, REST API.",
+    "currency": "RUB",
+    "url": "https://example.com/orders/fl-2411-002",
+    "client_name": "ИП Ковалёв",
+    "source": "manual"
+  },
+  {
+    "external_id": "fl-2411-003",
+    "title": "Сделать лендинг на Tilda под запуск курса",
+    "description": "Нужен лендинг на Tilda с интеграцией формы и настройкой рекламы. Также требуется SEO-оптимизация и дизайн в Figma. Бюджет 40000 рублей, срок 2 недели. Работа с текстами и графикой — наши.",
+    "budget_min": 40000,
+    "budget_max": 40000,
+    "currency": "RUB",
+    "url": "https://example.com/orders/fl-2411-003",
+    "client_name": "Академия «Рост»",
+    "source": "manual"
+  },
+  {
+    "external_id": "fl-2411-004",
+    "title": "Парсер каталога поставщика и выгрузка в Excel",
+    "description": "Нужен парсер для ежедневного сбора цен и остатков с сайта поставщика (Python, BeautifulSoup или Playwright), сохранение в PostgreSQL, выгрузка в Excel и отправка сводки по расписанию в Docker. Данные отдаются через REST API. Бюджет 60000-90000 рублей.",
+    "budget_min": 60000,
+    "budget_max": 90000,
+    "currency": "RUB",
+    "url": "https://example.com/orders/fl-2411-004",
+    "client_name": "ООО «Логистика Плюс»",
+    "source": "manual"
+  },
+  {
+    "external_id": "fl-2411-005",
+    "title": "Нужен специалист",
+    "description": "Здравствуйте, нужен специалист по вашему профилю, детали в личке.",
+    "currency": "RUB",
+    "url": "https://example.com/orders/fl-2411-005",
+    "client_name": "не указан",
+    "source": "manual"
+  }
+]

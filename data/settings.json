@@ -1,0 +1,8 @@
+{
+  "api_base_url": "http://127.0.0.1:8800",
+  "request_timeout_s": 30,
+  "report_language": "ru",
+  "max_orders_per_run": 25,
+  "summary_title": "Сводка по заказам",
+  "owner": "владелец проекта AI Freelance Copilot"
+}

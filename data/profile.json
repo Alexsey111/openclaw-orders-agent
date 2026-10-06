@@ -1,0 +1,32 @@
+{
+  "name": "владелец проекта",
+  "role": "фрилансер-разработчик (Python/AI), исполнитель заказов на фриланс-площадках",
+  "skills": [
+    "Python",
+    "FastAPI",
+    "PostgreSQL",
+    "Docker",
+    "LLM",
+    "REST API",
+    "AI automation",
+    "SQLAlchemy",
+    "Git",
+    "Parsing",
+    "Telegram",
+    "Data analysis",
+    "QA"
+  ],
+  "summary": "Разрабатываю backend и ИИ-автоматизацию на Python: FastAPI, PostgreSQL, Docker, интеграции с языковыми моделями. Делаю MVP с тестами и документацией, работаю итерациями с показом результата на каждом этапе.",
+  "preferences": {
+    "min_budget_rub": 50000,
+    "preferred_stack": ["Python", "FastAPI", "PostgreSQL", "Docker", "LLM"],
+    "avoid": ["WordPress", "Tilda", "PHP", "вёрстка", "SEO"],
+    "escalate_when": [
+      "бюджет не указан",
+      "описание короче 40 символов",
+      "стек не совпадает с профилем",
+      "оценка соответствия ниже порога ядра"
+    ]
+  },
+  "note": "Копия профиля для наглядности агента. Источник правды — профиль в ядре (GET /api/v1/profiles/active); при расхождении верно то, что вернуло ядро."
+}

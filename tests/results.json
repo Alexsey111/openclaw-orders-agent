@@ -1,0 +1,128 @@
+{
+  "status": "passed",
+  "passed": 5,
+  "total": 5,
+  "api": "http://127.0.0.1:8800",
+  "results": [
+    {
+      "case": "сильный заказ с бюджетом",
+      "external_id": "fl-2411-001",
+      "message": "Разбери заказ fl-2411-001 и скажи, стоит ли откликаться",
+      "expect": {
+        "recommendation": "apply",
+        "needs_review": false,
+        "draft_reply": true
+      },
+      "order_id": 1,
+      "status": "passed",
+      "checks": {
+        "recommendation": true,
+        "needs_review": true,
+        "has_draft": true
+      },
+      "got": {
+        "recommendation": "apply",
+        "needs_review": false,
+        "has_draft": true,
+        "match_score": 1.0,
+        "review_reason": null
+      }
+    },
+    {
+      "case": "заказ без бюджета",
+      "external_id": "fl-2411-002",
+      "message": "Проверь заказ fl-2411-002",
+      "expect": {
+        "recommendation": "review",
+        "needs_review": true,
+        "draft_reply": false
+      },
+      "order_id": 2,
+      "status": "passed",
+      "checks": {
+        "recommendation": true,
+        "needs_review": true,
+        "has_draft": true
+      },
+      "got": {
+        "recommendation": "review",
+        "needs_review": true,
+        "has_draft": false,
+        "match_score": null,
+        "review_reason": "не указан бюджет"
+      }
+    },
+    {
+      "case": "чужой стек",
+      "external_id": "fl-2411-003",
+      "message": "Что скажешь про заказ fl-2411-003?",
+      "expect": {
+        "recommendation": "skip",
+        "needs_review": false,
+        "draft_reply": false
+      },
+      "order_id": 3,
+      "status": "passed",
+      "checks": {
+        "recommendation": true,
+        "needs_review": true,
+        "has_draft": true
+      },
+      "got": {
+        "recommendation": "skip",
+        "needs_review": false,
+        "has_draft": false,
+        "match_score": 0.0,
+        "review_reason": null
+      }
+    },
+    {
+      "case": "парсинг и выгрузка — сильная сторона профиля",
+      "external_id": "fl-2411-004",
+      "message": "Оцени заказ fl-2411-004",
+      "expect": {
+        "recommendation": "apply",
+        "needs_review": false,
+        "draft_reply": true
+      },
+      "order_id": 4,
+      "status": "passed",
+      "checks": {
+        "recommendation": true,
+        "needs_review": true,
+        "has_draft": true
+      },
+      "got": {
+        "recommendation": "apply",
+        "needs_review": false,
+        "has_draft": true,
+        "match_score": 0.8333,
+        "review_reason": null
+      }
+    },
+    {
+      "case": "недостаточно данных",
+      "external_id": "fl-2411-005",
+      "message": "Посмотри заказ fl-2411-005",
+      "expect": {
+        "recommendation": "review",
+        "needs_review": true,
+        "draft_reply": false
+      },
+      "order_id": 5,
+      "status": "passed",
+      "checks": {
+        "recommendation": true,
+        "needs_review": true,
+        "has_draft": true
+      },
+      "got": {
+        "recommendation": "review",
+        "needs_review": true,
+        "has_draft": false,
+        "match_score": null,
+        "review_reason": "не указан бюджет"
+      }
+    }
+  ]
+}
