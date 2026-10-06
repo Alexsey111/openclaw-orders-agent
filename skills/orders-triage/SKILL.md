@@ -36,7 +36,10 @@ description: Разбор входящих фриланс-заказов чер�
 2. **Зальёшь заказ в ядро** (если его там ещё нет). Готовые пробные заказы:
    `python scripts/orders_ops.py ingest` — идемпотентно, повторные заливки не создают дублей.
    Свой заказ: добавь объект в `data/orders-seed.json` с уникальным `external_id` и повтори ingest.
-3. **Запусти разбор.** `python scripts/orders_ops.py triage --analyze --only-new`
+3. **Запусти разбор.**
+   - один заказ: `python scripts/orders_ops.py order --external-id fl-2411-001` — сама находит,
+     при необходимости заливает и считает; результат в `reports/latest-order.md`;
+   - пачка: `python scripts/orders_ops.py triage --analyze --only-new`
    Флаг `--only-new` разбирает только то, что ещё не разобрано. Без `--analyze` скрипт
    ничего не считает и денег не тратит — только показывает уже готовые решения.
 4. **Прочитай решение ядра** из `reports/latest-triage.md` (или из JSON-вывода команды).

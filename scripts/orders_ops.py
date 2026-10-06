@@ -214,6 +214,18 @@ def _collect_orders(api: Api, *, limit: int, status: str | None, only_without_an
 
 def cmd_triage(api: Api, *, analyze: bool, limit: int, status: str | None, only_new: bool) -> dict:
     orders = _collect_orders(api, limit=limit, status=status, only_without_analysis=only_new)
+    # Если просили только новые, а новых нет --- не затираем отчёт пустой таблицей:
+    # показываем последние решения по уже разобранным заказам и помечаем это в отчёте.
+    note = None
+    if only_new:
+        if not orders:
+            orders = _collect_orders(
+                api, limit=limit, status=status, only_without_analysis=False
+            )
+            analyze = False
+            note = (
+                "Новых заказов без анализа нет — показаны последние решения по уже разобранным."
+            )
     rows, errors = [], []
     for order in orders:
         entry = {
@@ -252,16 +264,18 @@ def cmd_triage(api: Api, *, analyze: bool, limit: int, status: str | None, only_
                     "match_score": latest.get("match_score"),
                     "recommendation": latest.get("recommendation"),
                     "needs_review": latest.get("needs_review"),
+                    "review_reason": latest.get("review_reason"),
                     "review_status": latest.get("review_status"),
                 }
             )
         rows.append(entry)
 
-    report = _render_triage(rows, api.base_url, analyzed=analyze)
+    report = _render_triage(rows, api.base_url, analyzed=analyze, note=note)
     write_text(TRIAGE_REPORT, report)
     return {
         "ok": True,
         "analyzed": analyze,
+        "note": note,
         "processed": len(rows),
         "errors": errors,
         "report": str(TRIAGE_REPORT.relative_to(ROOT)).replace("\\", "/"),
@@ -278,13 +292,16 @@ def _budget_text(order: dict) -> str:
     return "не указан"
 
 
-def _render_triage(rows: list[dict], base_url: str, *, analyzed: bool) -> str:
+def _render_triage(rows: list[dict], base_url: str, *, analyzed: bool, note: str | None = None) -> str:
     stamp = datetime.now().strftime("%Y-%m-%d %H:%M")
+    note_line = f"- Примечание: {note}\n" if note else ""
     head = (
         "# Разбор заказов\n\n"
         f"- Время: {stamp}\n"
         f"- Ядро: {base_url}\n"
-        f"- Заказов в прогоне: {len(rows)}\n\n"
+        f"- Заказов в прогоне: {len(rows)}\n"
+        + note_line
+        + "\n"
         "| ID | Заказ | Бюджет | Оценка | Решение | Нужен человек | Причина проверки |\n"
         "|---|---|---|---|---|---|---|\n"
     )
@@ -308,6 +325,108 @@ def _render_triage(rows: list[dict], base_url: str, *, analyzed: bool) -> str:
         for row in ready:
             tail += f"### Заказ {row['order_id']} — {row.get('title')}\n\n{row['draft_reply']}\n\n"
     return head + "\n".join(lines) + "\n" + tail
+
+
+# --------------------------------------------------------------------------- #
+# Команда order — разбор одного заказа по external_id (основной сценарий агента)
+# --------------------------------------------------------------------------- #
+def _find_order_by_external_id(api: Api, external_id: str) -> dict | None:
+    page = 1
+    while True:
+        chunk = api.orders(page=page, page_size=200)
+        for item in chunk.get("items", []):
+            if item.get("external_id") == external_id:
+                return item
+        if page * chunk.get("page_size", 200) >= chunk.get("total", 0):
+            return None
+        page += 1
+
+
+def cmd_order(api: Api, *, external_id: str, analyze: bool = True) -> dict:
+    """Разобрать один заказ: найти (или залить из сида), прогнать анализ, вернуть решение."""
+    order = _find_order_by_external_id(api, external_id)
+    if order is None:
+        seed = read_json(SEED_PATH, [])
+        if not any(item.get("external_id") == external_id for item in seed):
+            return {
+                "ok": False,
+                "error": (
+                    f"Заказ {external_id} не найден в ядре и отсутствует в data/orders-seed.json. "
+                    "Добавь его в сид-файл и повтори."
+                ),
+            }
+        cmd_ingest(api, limit=None)
+        order = _find_order_by_external_id(api, external_id)
+        if order is None:
+            return {"ok": False, "error": f"Заказ {external_id} не появился в ядре после заливки"}
+
+    order_id = order["id"]
+    if analyze or not order.get("latest_analysis"):
+        outcome = api.analyze(order_id)
+        result = outcome.get("result", {})
+        entry = {
+            "analysis_id": outcome.get("analysis_id"),
+            "duration_ms": outcome.get("duration_ms"),
+            "provider": outcome.get("provider"),
+            "model": outcome.get("model"),
+            "audit_status": outcome.get("audit_status"),
+            "match_score": result.get("match_score"),
+            "recommendation": result.get("recommendation"),
+            "reason": result.get("reason"),
+            "matched_skills": result.get("matched_skills"),
+            "missing_skills": result.get("missing_skills"),
+            "needs_review": result.get("needs_review"),
+            "review_reason": result.get("review_reason"),
+            "draft_reply": result.get("draft_reply"),
+        }
+    else:
+        latest = order["latest_analysis"]
+        entry = {
+            "analysis_id": latest.get("id"),
+            "match_score": latest.get("match_score"),
+            "recommendation": latest.get("recommendation"),
+            "needs_review": latest.get("needs_review"),
+            "review_reason": latest.get("review_reason"),
+            "draft_reply": None,
+        }
+    payload = {
+        "ok": True,
+        "order_id": order_id,
+        "external_id": external_id,
+        "title": order.get("title"),
+        "budget": _budget_text(order),
+        "order_status": order.get("status"),
+        **entry,
+    }
+    write_text(REPORTS_DIR / "latest-order.md", _render_single(payload, api.base_url))
+    payload["report"] = "reports/latest-order.md"
+    return payload
+
+
+def _render_single(payload: dict, base_url: str) -> str:
+    verdict = {"apply": "откликаться", "review": "на проверку", "skip": "пропустить"}
+    score = payload.get("match_score")
+    score_text = "не определена" if score is None else f"{score:.2f}"
+    decision = verdict.get(payload.get("recommendation") or "", "—")
+    human = "да" if payload.get("needs_review") else "нет"
+    reason = payload.get("review_reason") or "—"
+    draft = payload.get("draft_reply")
+    return f"""# Разбор заказа {payload.get('external_id')}
+
+- Время: {datetime.now().strftime('%Y-%m-%d %H:%M')}
+- Ядро: {base_url}
+- Заказ: #{payload.get('order_id')} {payload.get('title')}
+- Бюджет: {payload.get('budget')}
+- Оценка соответствия: {score_text}
+- Решение системы: {decision}
+- Нужен человек: {human}
+- Причина проверки: {reason}
+- Почему так: {payload.get('reason') or '—'}
+
+## Черновик отклика
+
+{draft if draft else 'черновик не сформирован'}
+"""
 
 
 # --------------------------------------------------------------------------- #
@@ -575,6 +694,12 @@ def main() -> int:
         help="брать только заказы без анализа (иначе пересчитываются все)",
     )
 
+    order = sub.add_parser("order", help="разобрать один заказ по external_id (основной сценарий)")
+    order.add_argument("--external-id", required=True, help="например fl-2411-001")
+    order.add_argument(
+        "--no-analyze", action="store_true", help="не запускать ИИ-анализ, взять последний готовый"
+    )
+
     queue = sub.add_parser("queue", help="очередь ручной проверки")
     queue.add_argument("--limit", type=int, default=50)
 
@@ -595,6 +720,8 @@ def main() -> int:
             payload = cmd_triage(
                 api, analyze=args.analyze, limit=args.limit, status=args.status, only_new=args.only_new
             )
+        elif args.command == "order":
+            payload = cmd_order(api, external_id=args.external_id, analyze=not args.no_analyze)
         elif args.command == "queue":
             payload = cmd_queue(api, limit=args.limit)
         elif args.command == "summary":
