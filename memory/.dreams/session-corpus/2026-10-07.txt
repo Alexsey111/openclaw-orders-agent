@@ -1,0 +1,2 @@
+[orders-operator/sessions/orders-operator/91f46a83-c18f-44b5-bcdc-e0f946c01cc0#L6] Assistant: I'll run the summary command as instructed.
+[orders-operator/sessions/orders-operator/91f46a83-c18f-44b5-bcdc-e0f946c01cc0#L9] Assistant: ## Сводку собрать не удалось Ядро (AI Freelance Copilot) не отвечает по адресу `http://127.0.0.1:8800` — подключение отклонено (`WinError 10061`). Скорее всего, backend не запущен. Команда `python scripts/orders_ops.py summary` вернула дословно: ``` 
