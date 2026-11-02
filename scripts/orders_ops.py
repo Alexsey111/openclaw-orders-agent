@@ -434,6 +434,18 @@ def _render_single(payload: dict, base_url: str) -> str:
 # --------------------------------------------------------------------------- #
 def cmd_queue(api: Api, *, limit: int) -> dict:
     queue = api.review_queue(review_status="pending", page_size=limit)
+    raw = queue.get("items", [])
+
+    # DEF-020: очередь отдавала записи анализа, а не заказы. Повторный разбор
+    # того же заказа добавлял вторую pending-запись, и владелец видел один
+    # заказ дважды. Оставляем по заказу самую свежую запись и печатаем
+    # оба числа: заказов и записей в источнике.
+    latest: dict[int, dict] = {}
+    for item in raw:
+        prev = latest.get(item["order_id"])
+        if prev is None or item["analysis_id"] > prev["analysis_id"]:
+            latest[item["order_id"]] = item
+
     items = [
         {
             "analysis_id": item["analysis_id"],
@@ -443,9 +455,14 @@ def cmd_queue(api: Api, *, limit: int) -> dict:
             "recommendation": item.get("recommendation"),
             "review_reason": item.get("review_reason"),
         }
-        for item in queue.get("items", [])
+        for item in sorted(latest.values(), key=lambda i: i["analysis_id"], reverse=True)
     ]
-    return {"ok": True, "pending_total": queue.get("total"), "items": items}
+    return {
+        "ok": True,
+        "pending_total": len(items),
+        "pending_records": queue.get("total"),
+        "items": items,
+    }
 
 
 # --------------------------------------------------------------------------- #
