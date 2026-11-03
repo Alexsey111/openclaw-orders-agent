@@ -1,6 +1,6 @@
 {
-  "status": "failed",
-  "passed": 0,
+  "status": "passed",
+  "passed": 5,
   "total": 5,
   "api": "http://127.0.0.1:8800",
   "results": [
@@ -13,8 +13,20 @@
         "needs_review": false,
         "draft_reply": true
       },
-      "status": "failed",
-      "why": "API недоступен по адресу http://127.0.0.1:8800 ([WinError 10061] Подключение не установлено, т.к. конечный компьютер отверг запрос на подключение). Поднимите backend ядра: uvicorn app.main:app --host 127.0.0.1 --port 8800"
+      "order_id": 1,
+      "status": "passed",
+      "checks": {
+        "recommendation": true,
+        "needs_review": true,
+        "has_draft": true
+      },
+      "got": {
+        "recommendation": "apply",
+        "needs_review": false,
+        "has_draft": true,
+        "match_score": 1.0,
+        "review_reason": null
+      }
     },
     {
       "case": "заказ без бюджета",
@@ -25,8 +37,20 @@
         "needs_review": true,
         "draft_reply": false
       },
-      "status": "failed",
-      "why": "API недоступен по адресу http://127.0.0.1:8800 ([WinError 10061] Подключение не установлено, т.к. конечный компьютер отверг запрос на подключение). Поднимите backend ядра: uvicorn app.main:app --host 127.0.0.1 --port 8800"
+      "order_id": 2,
+      "status": "passed",
+      "checks": {
+        "recommendation": true,
+        "needs_review": true,
+        "has_draft": true
+      },
+      "got": {
+        "recommendation": "review",
+        "needs_review": true,
+        "has_draft": false,
+        "match_score": null,
+        "review_reason": "не указан бюджет"
+      }
     },
     {
       "case": "чужой стек",
@@ -37,8 +61,20 @@
         "needs_review": false,
         "draft_reply": false
       },
-      "status": "failed",
-      "why": "API недоступен по адресу http://127.0.0.1:8800 ([WinError 10061] Подключение не установлено, т.к. конечный компьютер отверг запрос на подключение). Поднимите backend ядра: uvicorn app.main:app --host 127.0.0.1 --port 8800"
+      "order_id": 3,
+      "status": "passed",
+      "checks": {
+        "recommendation": true,
+        "needs_review": true,
+        "has_draft": true
+      },
+      "got": {
+        "recommendation": "skip",
+        "needs_review": false,
+        "has_draft": false,
+        "match_score": 0.0,
+        "review_reason": null
+      }
     },
     {
       "case": "парсинг и выгрузка — сильная сторона профиля",
@@ -49,8 +85,20 @@
         "needs_review": false,
         "draft_reply": true
       },
-      "status": "failed",
-      "why": "API недоступен по адресу http://127.0.0.1:8800 ([WinError 10061] Подключение не установлено, т.к. конечный компьютер отверг запрос на подключение). Поднимите backend ядра: uvicorn app.main:app --host 127.0.0.1 --port 8800"
+      "order_id": 4,
+      "status": "passed",
+      "checks": {
+        "recommendation": true,
+        "needs_review": true,
+        "has_draft": true
+      },
+      "got": {
+        "recommendation": "apply",
+        "needs_review": false,
+        "has_draft": true,
+        "match_score": 0.93,
+        "review_reason": null
+      }
     },
     {
       "case": "недостаточно данных",
@@ -61,8 +109,20 @@
         "needs_review": true,
         "draft_reply": false
       },
-      "status": "failed",
-      "why": "API недоступен по адресу http://127.0.0.1:8800 ([WinError 10061] Подключение не установлено, т.к. конечный компьютер отверг запрос на подключение). Поднимите backend ядра: uvicorn app.main:app --host 127.0.0.1 --port 8800"
+      "order_id": 5,
+      "status": "passed",
+      "checks": {
+        "recommendation": true,
+        "needs_review": true,
+        "has_draft": true
+      },
+      "got": {
+        "recommendation": "review",
+        "needs_review": true,
+        "has_draft": false,
+        "match_score": null,
+        "review_reason": "не указан бюджет"
+      }
     }
   ]
 }
