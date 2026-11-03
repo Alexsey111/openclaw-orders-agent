@@ -63,7 +63,7 @@
       "name": "Анализ заказа",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [200, 300]
+      "position": [400, 120]
     },
     {
       "parameters": {
@@ -81,7 +81,7 @@
       "name": "Итоги из ядра",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [420, 460]
+      "position": [660, 420]
     },
     {
       "parameters": {
@@ -92,7 +92,7 @@
       "name": "Сводка решений",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [420, 300]
+      "position": [880, 300]
     }
   ],
   "connections": {
