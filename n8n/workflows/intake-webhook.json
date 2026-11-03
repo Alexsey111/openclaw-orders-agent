@@ -1,0 +1,130 @@
+{
+  "name": "Приём заказа по вебхуку (n8n)",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "orders-intake",
+        "httpMethod": "POST",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-intake",
+      "name": "Webhook: заказ с площадки",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [-640, 300],
+      "webhookId": "c3f1a9e2-7b44-4d1a-9f55-2a7e0d6c1b30"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const raw = $json.body || $json;\nconst str = (v) => (typeof v === 'string' ? v.trim() : (v ?? null));\nconst num = (v) => {\n  if (v === null || v === undefined || v === '') return null;\n  if (typeof v === 'number') return v;\n  const cleaned = String(v).replace(/[^\\d.,-]/g, '').replace(',', '.');\n  const n = Number(cleaned);\n  return Number.isFinite(n) ? n : null;\n};\nconst bmin = num(raw.budget_min) ?? num(raw.budget);\nconst bmax = num(raw.budget_max) ?? num(raw.budget);\nconst payload = {\n  title: str(raw.title) || '',\n  description: str(raw.description) || '',\n  budget_min: bmin,\n  budget_max: bmax,\n  currency: 'RUB',\n  url: str(raw.url) || null,\n  client_name: str(raw.client_name) || null,\n  external_id: str(raw.external_id) || null,\n  source: 'manual'\n};\nreturn [{ json: { payload } }];"
+      },
+      "id": "code-normalize",
+      "name": "Нормализация",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-420, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8800/api/v1/orders",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.payload) }}",
+        "options": {
+          "timeout": 60000,
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "http-create",
+      "name": "Создать заказ в ядре",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [-200, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://host.docker.internal:8800/api/v1/orders/{{ $json.body.id }}/analyze",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{}",
+        "options": {
+          "timeout": 120000,
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "http-analyze-intake",
+      "name": "Разобрать заказ",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [20, 300]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const create = $('Создать заказ в ядре').first().json;\nconst analyze = $input.first().json;\nconst bodyOf = (r) => (r && r.body) || {};\n\nif (!create || create.statusCode >= 400) {\n  const b = bodyOf(create);\n  return [{ json: { code: 422, body: {\n    ok: false,\n    stage: 'create',\n    error: b.detail || b.error || 'ядро отклонило заказ',\n    order: bodyOf(create)\n  } } }];\n}\n\nif (!analyze || analyze.statusCode >= 400) {\n  return [{ json: { code: 502, body: {\n    ok: false,\n    stage: 'analyze',\n    order_id: bodyOf(create).id,\n    error: bodyOf(analyze).detail || bodyOf(analyze).error || 'ядро не смогло разобрать заказ'\n  } } }];\n}\n\nconst res = bodyOf(analyze).result || {};\nreturn [{ json: { code: 200, body: {\n  ok: true,\n  order_id: bodyOf(analyze).order_id,\n  decision: res.recommendation,\n  needs_review: res.needs_review,\n  score: res.match_score,\n  reason: res.reason,\n  draft_reply: res.draft_reply || null\n} } }];"
+      },
+      "id": "code-answer",
+      "name": "Ответ клиенту",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json.body) }}",
+        "options": {
+          "responseCode": "={{ $json.code }}"
+        }
+      },
+      "id": "respond-intake",
+      "name": "Ответ по HTTP",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [460, 300]
+    }
+  ],
+  "connections": {
+    "Webhook: заказ с площадки": {
+      "main": [
+        [{ "node": "Нормализация", "type": "main", "index": 0 }]
+      ]
+    },
+    "Нормализация": {
+      "main": [
+        [{ "node": "Создать заказ в ядре", "type": "main", "index": 0 }]
+      ]
+    },
+    "Создать заказ в ядре": {
+      "main": [
+        [{ "node": "Разобрать заказ", "type": "main", "index": 0 }]
+      ]
+    },
+    "Разобрать заказ": {
+      "main": [
+        [{ "node": "Ответ клиенту", "type": "main", "index": 0 }]
+      ]
+    },
+    "Ответ клиенту": {
+      "main": [
+        [{ "node": "Ответ по HTTP", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "settings": { "executionOrder": "v1" },
+  "active": false
+}
