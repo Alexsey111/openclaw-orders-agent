@@ -6,10 +6,10 @@
 ## Подготовка (до записи, в кадр не попадает)
 
 ```bash
-# 1. ядро на отдельной базе прогона
+# 1. ядро на отдельной базе прогона — двойной щелчок по scripts\run_live.cmd
+#    или из PowerShell:  cd "D:\python projects\AI_Freelance_Copilot"; .\scripts\run_live.ps1
+#    (в cmd.exe/PowerShell строки вида DATABASE_URL=... не работают — это синтаксис bash)
 cd "D:/python projects/AI_Freelance_Copilot"
-DATABASE_URL="sqlite:///./data/live.db" LLM_PROVIDER=openai \
-  ./.venv/Scripts/python.exe -m uvicorn app.main:app --host 127.0.0.1 --port 8800
 
 # 2. окно терминала — крупный шрифт, тёмный фон, ширина ~110 символов
 cd "D:/python projects/openclaw-orders-agent"

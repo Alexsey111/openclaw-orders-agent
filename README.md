@@ -68,9 +68,11 @@
 
 ```bash
 # ядро — отдельная база прогона, реальный провайдер (ключ в .env, в репозиторий не попадает)
+# проще всего: двойной щелчок по scripts\run_live.cmd
+# из PowerShell:   cd "D:\python projects\AI_Freelance_Copilot"; .\scripts\run_live.ps1
+# в bash:          DATABASE_URL="sqlite:///./data/live.db" LLM_PROVIDER=openai \
+#                    ./.venv/Scripts/python.exe -m uvicorn app.main:app --host 127.0.0.1 --port 8800
 cd "D:/python projects/AI_Freelance_Copilot"
-DATABASE_URL="sqlite:///./data/live.db" LLM_PROVIDER=openai \
-  ./.venv/Scripts/python.exe -m uvicorn app.main:app --host 127.0.0.1 --port 8800
 
 # агент
 cd "D:/python projects/openclaw-orders-agent"
