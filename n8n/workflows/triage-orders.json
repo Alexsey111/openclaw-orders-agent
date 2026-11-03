@@ -1,0 +1,133 @@
+{
+  "id": "qV2BZQPvBA9mKw3n",
+  "name": "Разбор заказов через ядро (n8n)",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "trigger-manual",
+      "name": "Старт",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [-460, 300]
+    },
+    {
+      "parameters": {
+        "url": "http://host.docker.internal:8800/api/v1/orders",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "page", "value": "1" },
+            { "name": "page_size", "value": "25" }
+          ]
+        },
+        "options": { "timeout": 60000 }
+      },
+      "id": "http-list",
+      "name": "Заказы из ядра",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [-240, 300]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const payload = $input.first().json || {};\nconst items = payload.items || [];\nconst fresh = items.filter(o => ['new', 'error'].includes(o.status));\nreturn fresh.map(o => ({\n  json: {\n    id: o.id,\n    external_id: o.external_id,\n    title: o.title,\n    budget_min: o.budget_min,\n    budget_max: o.budget_max\n  },\n}));"
+      },
+      "id": "code-filter",
+      "name": "Только новые",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-20, 300]
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      },
+      "id": "loop-one",
+      "name": "По одному",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [180, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://host.docker.internal:8800/api/v1/orders/{{ $json.id }}/analyze",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{}",
+        "options": { "timeout": 120000 }
+      },
+      "id": "http-analyze",
+      "name": "Анализ заказа",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [200, 300]
+    },
+    {
+      "parameters": {
+        "url": "http://host.docker.internal:8800/api/v1/orders",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "page", "value": "1" },
+            { "name": "page_size", "value": "25" }
+          ]
+        },
+        "options": { "timeout": 60000 }
+      },
+      "id": "http-results",
+      "name": "Итоги из ядра",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [420, 460]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const payload = $input.first().json || {};\nconst items = payload.items || [];\nconst counts = { apply: 0, review: 0, skip: 0 };\nconst queue = [];\nfor (const o of items) {\n  const a = o.latest_analysis || {};\n  const rec = a.recommendation || 'unknown';\n  counts[rec] = (counts[rec] || 0) + 1;\n  if (a.needs_review) {\n    queue.push({\n      order_id: o.id,\n      external_id: o.external_id,\n      title: o.title,\n      reason: a.review_reason || '',\n      score: a.match_score\n    });\n  }\n}\nreturn [{\n  json: {\n    orders: items.length,\n    counts,\n    review_share: items.length ? +(counts.review / items.length).toFixed(2) : 0,\n    queue_size: queue.length,\n    queue\n  }\n}];"
+      },
+      "id": "code-summary",
+      "name": "Сводка решений",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [420, 300]
+    }
+  ],
+  "connections": {
+    "Старт": {
+      "main": [
+        [{ "node": "Заказы из ядра", "type": "main", "index": 0 }]
+      ]
+    },
+    "Заказы из ядра": {
+      "main": [
+        [{ "node": "Только новые", "type": "main", "index": 0 }]
+      ]
+    },
+    "Только новые": {
+      "main": [
+        [{ "node": "По одному", "type": "main", "index": 0 }]
+      ]
+    },
+    "По одному": {
+      "main": [
+        [{ "node": "Итоги из ядра", "type": "main", "index": 0 }],
+        [{ "node": "Анализ заказа", "type": "main", "index": 0 }]
+      ]
+    },
+    "Анализ заказа": {
+      "main": [
+        [{ "node": "По одному", "type": "main", "index": 0 }]
+      ]
+    },
+    "Итоги из ядра": {
+      "main": [
+        [{ "node": "Сводка решений", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "settings": { "executionOrder": "v1" },
+  "active": false
+}
