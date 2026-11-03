@@ -1,39 +1,43 @@
 {
-  "run": "живой прогон 20 заказов на реальной модели",
+  "run": "живой прогон 20 заказов на реальной модели, профиль владельца + правило бюджета",
   "date": "2026-11-03",
   "core": "AI Freelance Copilot, gpt-4o-mini через proxyapi",
-  "database": "data/live.db (отдельная база прогона: 20 заказов, 20 анализов)",
+  "database": "data/live.db (20 заказов, 20 анализов)",
+  "profile": "заполнен scripts/seed_profile.py из data/profile.json: 13 навыков, минимум 50 000 ₽, список «чего не беру»",
   "orders": 20,
   "analyses": 20,
   "errors": 0,
   "recommendations": {
-    "apply": 10,
-    "review": 7,
-    "skip": 3
+    "apply": 8,
+    "review": 4,
+    "skip": 8
   },
-  "review_share": 0.35,
-  "json_valid": true,
+  "review_share": 0.2,
   "duration_ms": {
-    "avg": 2075,
-    "median": 2044,
-    "max": 2649
+    "avg": 2135,
+    "median": 2011,
+    "max": 3996
   },
   "tokens": {
-    "input": 20846,
-    "output": 2721,
-    "per_order_avg": 1178,
-    "measured_by": "scripts/measure_cost.py ядра (usage из ответа провайдера, те же 20 промптов)"
+    "input": 24666,
+    "output": 2624,
+    "per_order_avg": 1364,
+    "measured_by": "scripts/measure_cost.py (usage из ответа провайдера, те же промпты, копия базы)"
   },
   "cost_rub": {
-    "total": 1.235,
-    "per_order": 0.0617,
+    "total": 1.369,
+    "per_order": 0.0684,
     "prices_per_1m": [
       39.0,
       155.0
     ],
     "source": "proxyapi.ru/models/openai/gpt-4o-mini, 03.11.2026, с НДС"
   },
-  "repeatability": "второй прогон тем же кодом на копии базы дал те же 20 решений из 20",
+  "repeatability": {
+    "matched": 20,
+    "of": 20,
+    "note": "второй прогон тем же кодом на копии базы"
+  },
   "items": [
     {
       "order_id": 1,
@@ -47,10 +51,10 @@
       "review_reason": null,
       "missing_skills": [],
       "model": "gpt-4o-mini",
-      "draft_chars": 218,
-      "analyzed_at": "2026-11-03 02:17:36.809724",
-      "duration_ms": 2247,
-      "audit_status": "success"
+      "draft_chars": 235,
+      "analyzed_at": "2026-11-03 04:11:43.854984",
+      "duration_ms": 2235,
+      "repeat_recommendation": "apply"
     },
     {
       "order_id": 2,
@@ -65,9 +69,9 @@
       "missing_skills": [],
       "model": "gpt-4o-mini",
       "draft_chars": 0,
-      "analyzed_at": "2026-11-03 02:17:34.540549",
-      "duration_ms": 1853,
-      "audit_status": "review"
+      "analyzed_at": "2026-11-03 04:11:41.603170",
+      "duration_ms": 1425,
+      "repeat_recommendation": "review"
     },
     {
       "order_id": 3,
@@ -75,20 +79,19 @@
       "title": "Сделать лендинг на Tilda под запуск курса",
       "budget_min": 40000.0,
       "budget_max": 40000.0,
-      "match_score": 0.0,
+      "match_score": null,
       "recommendation": "skip",
       "needs_review": false,
       "review_reason": null,
       "missing_skills": [
-        "веб-дизайн",
-        "SEO-оптимизация",
-        "Tilda"
+        "Tilda",
+        "SEO"
       ],
       "model": "gpt-4o-mini",
       "draft_chars": 0,
-      "analyzed_at": "2026-11-03 02:17:32.684267",
-      "duration_ms": 1697,
-      "audit_status": "success"
+      "analyzed_at": "2026-11-03 04:11:40.174166",
+      "duration_ms": 3486,
+      "repeat_recommendation": "skip"
     },
     {
       "order_id": 4,
@@ -103,9 +106,9 @@
       "missing_skills": [],
       "model": "gpt-4o-mini",
       "draft_chars": 226,
-      "analyzed_at": "2026-11-03 02:17:30.961827",
-      "duration_ms": 2649,
-      "audit_status": "success"
+      "analyzed_at": "2026-11-03 04:11:36.684715",
+      "duration_ms": 2230,
+      "repeat_recommendation": "apply"
     },
     {
       "order_id": 5,
@@ -120,9 +123,9 @@
       "missing_skills": [],
       "model": "gpt-4o-mini",
       "draft_chars": 0,
-      "analyzed_at": "2026-11-03 02:17:28.300312",
-      "duration_ms": 1635,
-      "audit_status": "review"
+      "analyzed_at": "2026-11-03 04:11:34.436617",
+      "duration_ms": 1268,
+      "repeat_recommendation": "review"
     },
     {
       "order_id": 6,
@@ -136,10 +139,10 @@
       "review_reason": null,
       "missing_skills": [],
       "model": "gpt-4o-mini",
-      "draft_chars": 226,
-      "analyzed_at": "2026-11-03 02:17:26.662123",
-      "duration_ms": 1985,
-      "audit_status": "success"
+      "draft_chars": 263,
+      "analyzed_at": "2026-11-03 04:11:33.148228",
+      "duration_ms": 2492,
+      "repeat_recommendation": "apply"
     },
     {
       "order_id": 7,
@@ -147,16 +150,16 @@
       "title": "Парсер цен конкурентов и уведомления в Telegram",
       "budget_min": 45000.0,
       "budget_max": 45000.0,
-      "match_score": 0.87,
-      "recommendation": "apply",
+      "match_score": null,
+      "recommendation": "skip",
       "needs_review": false,
       "review_reason": null,
       "missing_skills": [],
       "model": "gpt-4o-mini",
-      "draft_chars": 195,
-      "analyzed_at": "2026-11-03 02:17:24.655074",
-      "duration_ms": 2163,
-      "audit_status": "success"
+      "draft_chars": 0,
+      "analyzed_at": "2026-11-03 04:11:30.643325",
+      "duration_ms": 1507,
+      "repeat_recommendation": "skip"
     },
     {
       "order_id": 8,
@@ -164,18 +167,18 @@
       "title": "Автоматизировать сборку отчётов из выгрузок 1С в Excel",
       "budget_min": 30000.0,
       "budget_max": 50000.0,
-      "match_score": null,
-      "recommendation": "review",
-      "needs_review": true,
-      "review_reason": "Оценка модели расходится с расчётом по профилю (0.87 против 0.33)",
+      "match_score": 0.6,
+      "recommendation": "skip",
+      "needs_review": false,
+      "review_reason": null,
       "missing_skills": [
-        "1С"
+        "опыт с 1С"
       ],
       "model": "gpt-4o-mini",
       "draft_chars": 0,
-      "analyzed_at": "2026-11-03 02:17:22.469732",
-      "duration_ms": 1852,
-      "audit_status": "review"
+      "analyzed_at": "2026-11-03 04:11:29.108773",
+      "duration_ms": 1432,
+      "repeat_recommendation": "skip"
     },
     {
       "order_id": 9,
@@ -183,16 +186,16 @@
       "title": "Чат-бот с поиском по базе знаний (RAG)",
       "budget_min": 150000.0,
       "budget_max": 150000.0,
-      "match_score": 0.93,
+      "match_score": 1.0,
       "recommendation": "apply",
       "needs_review": false,
       "review_reason": null,
       "missing_skills": [],
       "model": "gpt-4o-mini",
-      "draft_chars": 248,
-      "analyzed_at": "2026-11-03 02:17:20.614719",
-      "duration_ms": 2333,
-      "audit_status": "success"
+      "draft_chars": 232,
+      "analyzed_at": "2026-11-03 04:11:27.670040",
+      "duration_ms": 2243,
+      "repeat_recommendation": "apply"
     },
     {
       "order_id": 10,
@@ -200,20 +203,21 @@
       "title": "Вёрстка интернет-магазина по макетам Figma (React)",
       "budget_min": 80000.0,
       "budget_max": 80000.0,
-      "match_score": null,
-      "recommendation": "review",
-      "needs_review": true,
-      "review_reason": "Необходима проверка, так как исполнитель не соответствует требованиям по навыкам frontend-разработки.",
+      "match_score": 0.0,
+      "recommendation": "skip",
+      "needs_review": false,
+      "review_reason": null,
       "missing_skills": [
+        "вёрстка",
         "React",
         "TypeScript",
         "SCSS"
       ],
       "model": "gpt-4o-mini",
       "draft_chars": 0,
-      "analyzed_at": "2026-11-03 02:17:18.259705",
-      "duration_ms": 2044,
-      "audit_status": "review"
+      "analyzed_at": "2026-11-03 04:11:25.423453",
+      "duration_ms": 1632,
+      "repeat_recommendation": "skip"
     },
     {
       "order_id": 11,
@@ -222,19 +226,18 @@
       "budget_min": 25000.0,
       "budget_max": 25000.0,
       "match_score": null,
-      "recommendation": "review",
-      "needs_review": true,
-      "review_reason": "Необходима проверка, так как профиль исполнителя не соответствует требованиям заказа по навыкам.",
+      "recommendation": "skip",
+      "needs_review": false,
+      "review_reason": null,
       "missing_skills": [
         "SEO",
-        "оптимизация текстов",
-        "наращивание ссылочной массы"
+        "WordPress"
       ],
       "model": "gpt-4o-mini",
       "draft_chars": 0,
-      "analyzed_at": "2026-11-03 02:17:16.211746",
-      "duration_ms": 2432,
-      "audit_status": "review"
+      "analyzed_at": "2026-11-03 04:11:23.785017",
+      "duration_ms": 2011,
+      "repeat_recommendation": "skip"
     },
     {
       "order_id": 12,
@@ -242,16 +245,18 @@
       "title": "Настроить автоматизацию в n8n: заявки в Google Sheets",
       "budget_min": 20000.0,
       "budget_max": 20000.0,
-      "match_score": 0.75,
-      "recommendation": "apply",
+      "match_score": null,
+      "recommendation": "skip",
       "needs_review": false,
       "review_reason": null,
-      "missing_skills": [],
+      "missing_skills": [
+        "n8n"
+      ],
       "model": "gpt-4o-mini",
-      "draft_chars": 218,
-      "analyzed_at": "2026-11-03 02:17:13.769329",
-      "duration_ms": 1954,
-      "audit_status": "success"
+      "draft_chars": 0,
+      "analyzed_at": "2026-11-03 04:11:21.771247",
+      "duration_ms": 1443,
+      "repeat_recommendation": "skip"
     },
     {
       "order_id": 13,
@@ -259,16 +264,16 @@
       "title": "Настроить CI/CD и Docker для Python-сервиса",
       "budget_min": 40000.0,
       "budget_max": 60000.0,
-      "match_score": 1.0,
+      "match_score": 0.9,
       "recommendation": "apply",
       "needs_review": false,
       "review_reason": null,
       "missing_skills": [],
       "model": "gpt-4o-mini",
-      "draft_chars": 219,
-      "analyzed_at": "2026-11-03 02:17:11.811680",
-      "duration_ms": 2234,
-      "audit_status": "success"
+      "draft_chars": 209,
+      "analyzed_at": "2026-11-03 04:11:20.299982",
+      "duration_ms": 1988,
+      "repeat_recommendation": "apply"
     },
     {
       "order_id": 14,
@@ -282,10 +287,10 @@
       "review_reason": null,
       "missing_skills": [],
       "model": "gpt-4o-mini",
-      "draft_chars": 256,
-      "analyzed_at": "2026-11-03 02:17:09.559642",
-      "duration_ms": 2434,
-      "audit_status": "success"
+      "draft_chars": 237,
+      "analyzed_at": "2026-11-03 04:11:18.304356",
+      "duration_ms": 1871,
+      "repeat_recommendation": "apply"
     },
     {
       "order_id": 15,
@@ -300,9 +305,9 @@
       "missing_skills": [],
       "model": "gpt-4o-mini",
       "draft_chars": 0,
-      "analyzed_at": "2026-11-03 02:17:07.102970",
-      "duration_ms": 1728,
-      "audit_status": "review"
+      "analyzed_at": "2026-11-03 04:11:16.408291",
+      "duration_ms": 1473,
+      "repeat_recommendation": "review"
     },
     {
       "order_id": 16,
@@ -315,15 +320,14 @@
       "needs_review": false,
       "review_reason": null,
       "missing_skills": [
-        "1С-Битрикс",
         "PHP",
-        "MySQL"
+        "1С-Битрикс"
       ],
       "model": "gpt-4o-mini",
       "draft_chars": 0,
-      "analyzed_at": "2026-11-03 02:17:05.361458",
-      "duration_ms": 1709,
-      "audit_status": "success"
+      "analyzed_at": "2026-11-03 04:11:14.932011",
+      "duration_ms": 1581,
+      "repeat_recommendation": "skip"
     },
     {
       "order_id": 17,
@@ -337,10 +341,10 @@
       "review_reason": null,
       "missing_skills": [],
       "model": "gpt-4o-mini",
-      "draft_chars": 219,
-      "analyzed_at": "2026-11-03 02:17:03.627633",
-      "duration_ms": 2152,
-      "audit_status": "success"
+      "draft_chars": 230,
+      "analyzed_at": "2026-11-03 04:11:13.347595",
+      "duration_ms": 2954,
+      "repeat_recommendation": "apply"
     },
     {
       "order_id": 18,
@@ -348,19 +352,19 @@
       "title": "Сопровождение рабочего Telegram-бота: 20 часов в месяц",
       "budget_min": 30000.0,
       "budget_max": 30000.0,
-      "match_score": 0.5,
-      "recommendation": "review",
-      "needs_review": true,
-      "review_reason": "Необходима проверка, так как отсутствуют ключевые навыки для выполнения заказа.",
+      "match_score": null,
+      "recommendation": "skip",
+      "needs_review": false,
+      "review_reason": null,
       "missing_skills": [
         "aiogram",
         "Redis"
       ],
       "model": "gpt-4o-mini",
       "draft_chars": 0,
-      "analyzed_at": "2026-11-03 02:17:01.469959",
-      "duration_ms": 2026,
-      "audit_status": "review"
+      "analyzed_at": "2026-11-03 04:11:10.373548",
+      "duration_ms": 3996,
+      "repeat_recommendation": "skip"
     },
     {
       "order_id": 19,
@@ -368,21 +372,19 @@
       "title": "Дашборды и аналитика продаж для руководителей",
       "budget_min": 70000.0,
       "budget_max": 70000.0,
-      "match_score": 0.0,
-      "recommendation": "skip",
-      "needs_review": false,
-      "review_reason": null,
+      "match_score": 0.5,
+      "recommendation": "review",
+      "needs_review": true,
+      "review_reason": "Необходимо уточнить, использует ли исполнитель указанные инструменты для создания дашбордов.",
       "missing_skills": [
-        "аналитика",
-        "дашборды",
         "Metabase",
         "Power BI"
       ],
       "model": "gpt-4o-mini",
       "draft_chars": 0,
-      "analyzed_at": "2026-11-03 02:16:59.418083",
-      "duration_ms": 1928,
-      "audit_status": "success"
+      "analyzed_at": "2026-11-03 04:11:06.374020",
+      "duration_ms": 2729,
+      "repeat_recommendation": "review"
     },
     {
       "order_id": 20,
@@ -396,11 +398,11 @@
       "review_reason": null,
       "missing_skills": [],
       "model": "gpt-4o-mini",
-      "draft_chars": 257,
-      "analyzed_at": "2026-11-03 02:16:57.486697",
-      "duration_ms": 2463,
-      "audit_status": "success"
+      "draft_chars": 260,
+      "analyzed_at": "2026-11-03 04:11:03.624285",
+      "duration_ms": 2706,
+      "repeat_recommendation": "apply"
     }
   ],
-  "generated_at": "2026-11-03T09:17:48"
+  "generated_at": "2026-11-03T11:12:36"
 }
