@@ -227,7 +227,10 @@ def cmd_triage(api: Api, *, analyze: bool, limit: int, status: str | None, only_
                 "Новых заказов без анализа нет — показаны последние решения по уже разобранным."
             )
     rows, errors = [], []
-    for order in orders:
+    total = len(orders)
+    if analyze and sys.stderr.isatty():
+        print(f"разбор {total} заказов, ИИ по каждому…", file=sys.stderr, flush=True)
+    for index, order in enumerate(orders, 1):
         entry = {
             "order_id": order["id"],
             "external_id": order.get("external_id"),
@@ -269,7 +272,18 @@ def cmd_triage(api: Api, *, analyze: bool, limit: int, status: str | None, only_
                 }
             )
         rows.append(entry)
+        if analyze and sys.stderr.isatty():
+            recommendation = entry.get("recommendation") or entry.get("error") or "—"
+            seconds = (entry.get("duration_ms") or 0) / 1000
+            mark = "!" if entry.get("needs_review") else " "
+            print(
+                f"[{index:2d}/{total}] {str(entry.get('external_id'))[:14]:<14}"
+                f" {str(recommendation)[:9]:<9} {seconds:4.1f} с{mark}",
+                file=sys.stderr,
+                flush=True,
+            )
 
+    rows.sort(key=_decision_rank)
     report = _render_triage(rows, api.base_url, analyzed=analyze, note=note)
     write_text(TRIAGE_REPORT, report)
     return {
@@ -281,6 +295,20 @@ def cmd_triage(api: Api, *, analyze: bool, limit: int, status: str | None, only_
         "report": str(TRIAGE_REPORT.relative_to(ROOT)).replace("\\", "/"),
         "rows": rows,
     }
+
+
+DECISION_ORDER = {"apply": 0, "review": 1, "skip": 2}
+
+
+def _decision_rank(row: dict) -> tuple:
+    """Порядок для человека: откликаться, потом на проверку, потом пропуск.
+
+    Внутри группы сохраняется исходный порядок (сортировка стабильная),
+    заказы с ошибкой разбора уходят в конец.
+    """
+    if row.get("error") and not row.get("recommendation"):
+        return (4, str(row.get("order_id")))
+    return (DECISION_ORDER.get(row.get("recommendation") or "", 3), "")
 
 
 def _budget_text(order: dict) -> str:
