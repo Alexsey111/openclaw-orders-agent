@@ -1,0 +1,4 @@
+{
+  "title": "Need a Telegram bot for order notifications",
+  "description": "Python, aiogram, SQLite storage, deploy to VPS. Notifications to a manager chat, daily summary."
+}

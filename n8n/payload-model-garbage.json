@@ -1,0 +1,5 @@
+{
+  "title": "MOCK_BAD_JSON need a parser for 3 sites",
+  "description": "Python, daily collection, export to CSV. Model is forced to return broken JSON in this test.",
+  "budget": "70000"
+}

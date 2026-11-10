@@ -26,7 +26,7 @@ docker compose up -d
 
 - `docker-compose.yml` — один сервис n8n, том `./data`, часовой пояс UTC+7.
 - `workflows/triage-orders.json` — разбор всех новых заказов из ядра (20 за 40 с).
-- `workflows/intake-webhook.json` — приём одного заказа по `POST /webhook/orders-intake`
+- `workflows/intake-webhook.json` — приём одного заказа по `POST /webhook/orders/intake`
   с ответом «решение + черновик»; активен, порт 5678.
 - `data/` — база n8n и ключ шифрования credentials, в git не попадает.
 

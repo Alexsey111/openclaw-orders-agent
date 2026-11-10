@@ -129,13 +129,13 @@ workflow только дёргает его API по одному заказу.
 
 ### Приём заказа по вебхуку (тот же n8n)
 
-Второй workflow — входная точка для площадки: `POST /webhook/orders-intake` принимает заказ
+Второй workflow — входная точка для площадки: `POST /webhook/orders/intake` принимает заказ
 JSON'ом, создаёт его в ядре, сразу разбирает и отдаёт решение с черновиком ответа. Три проверки
 живьём:
 
 ```bash
 # 1) нормальный заказ → 200 + решение + черновик
-curl -X POST http://localhost:5678/webhook/orders-intake -H "Content-Type: application/json" \
+curl -X POST http://localhost:5678/webhook/orders/intake -H "Content-Type: application/json" \
   -d '{"title":"Автоматизация отчётов из 1С в Excel","description":"20 выгрузок вручную, нужен скрипт на Python","budget_min":"40 000","budget_max":"60 000","client_name":"ООО Тест"}'
 # → {"ok":true,"order_id":21,"decision":"apply","needs_review":false,"score":0.87,"draft_reply":"Здравствуйте! ..."} за 2,8 с
 
